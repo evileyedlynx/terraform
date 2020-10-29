@@ -57,7 +57,8 @@ resource "aws_instance" "builder" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt update && sudo apt install -y default-jdk maven awscli",
+      "sudo apt update",
+      "sudo apt install -y default-jdk maven awscli",
       "git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
       "cd boxfuse-sample-java-war-hello && mvn package",
 #      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && 
@@ -95,7 +96,8 @@ resource "aws_instance" "tomcat" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt update && sudo apt install -y default-jdk tomcat8 awscli",
+      "sudo apt update",
+      "sudo apt install -y default-jdk tomcat8 awscli",
 #      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && 
 #      "export AWS_DEFAULT_REGION=us-east-2",
       "aws configure set aws_access_key_id ${var.aws-id}",
