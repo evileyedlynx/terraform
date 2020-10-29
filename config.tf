@@ -79,13 +79,14 @@ resource "aws_instance" "tomcat" {
   provisioner "file" {
     source = "~/.aws/credentials"
     destination = "~/.aws/credentials"
-
+  }
   connection {
     type = "ssh"
     user = "ubuntu"
     private_key = "${file("~/.ssh/id_rsa")}"
     agent = "false"
-
+  }
+  
   provisioner "remote-exec" {
     inline = [
       "sudo apt update && sudo apt install -y default-jdk tomcat8 awscli",
