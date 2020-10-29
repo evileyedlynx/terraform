@@ -40,12 +40,25 @@ resource "aws_instance" "builder" {
   key_name = "awv_key"
   vpc_security_group_ids = ["${aws_security_group.test_group_terra.id}"]
 
+  provisioner "file" {
+    source = "~/.aws/credentials"
+    destination = "~/.aws/credentials"
+
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      private_key = "${file("~/.ssh/id_rsa")}"
+      agent = "false"
+  }
+  }
+
   provisioner "remote-exec" {
     inline = [
       "sudo apt update && sudo apt install -y default-jdk maven awscli",
       "git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
       "cd boxfuse-sample-java-war-hello && mvn package",
-      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && export AWS_DEFAULT_REGION=us-east-2",
+#      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && 
+      "export AWS_DEFAULT_REGION=us-east-2",
       "aws s3 cp target/hello-1.0.war s3://zloben.test.ru"  
     ]
   }
@@ -63,10 +76,21 @@ resource "aws_instance" "tomcat" {
   key_name = "${aws_key_pair.awv_key.key_name}"
   vpc_security_group_ids = ["${aws_security_group.test_group_terra.id}"]
 
+  provisioner "file" {
+    source = "~/.aws/credentials"
+    destination = "~/.aws/credentials"
+
+  connection {
+    type = "ssh"
+    user = "ubuntu"
+    private_key = "${file("~/.ssh/id_rsa")}"
+    agent = "false"
+
   provisioner "remote-exec" {
     inline = [
       "sudo apt update && sudo apt install -y default-jdk tomcat8 awscli",
-      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && export AWS_DEFAULT_REGION=us-east-2",
+#      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && 
+      "export AWS_DEFAULT_REGION=us-east-2",
       "aws s3 cp s3://zloben.test.ru/hello-1.0.war /tmp/hello-1.0.war",
       "sudo mv /tmp/hello-1.0.war /var/lib/tomcat8/webapps/hello-1.0.war",
       "sudo systemctl restart tomcat8"
