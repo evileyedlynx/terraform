@@ -58,15 +58,14 @@ resource "aws_instance" "builder" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt update",
-      "sudo apt install -y default-jdk maven awscli",
+      "sudo apt install -y default-jdk maven",
+      "curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && unzip awscli-bundle.zip && sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws",
       "git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
       "cd boxfuse-sample-java-war-hello && mvn package",
-#      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && 
-#      "export AWS_DEFAULT_REGION=us-east-2",
-       "aws configure set aws_access_key_id ${var.aws-id}",
-       "aws configure set aws_secret_access_key ${var.aws-sec}",
-       "aws configure set default.region us-east-2",
-       "aws s3 cp target/hello-1.0.war s3://zloben.test.ru"  
+      "aws configure set aws_access_key_id ${var.aws-id}",
+      "aws configure set aws_secret_access_key ${var.aws-sec}",
+      "aws configure set default.region us-east-2",
+      "aws s3 cp target/hello-1.0.war s3://zloben.test.ru"  
     ]
   }
   connection {
@@ -97,9 +96,9 @@ resource "aws_instance" "tomcat" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt update",
-      "sudo apt install -y default-jdk tomcat8 awscli",
-#      "export AWS_ACCESS_KEY_ID= "${var.aws-id}" && export AWS_SECRET_ACCESS_KEY= "${var.aws-sec}" && 
-#      "export AWS_DEFAULT_REGION=us-east-2",
+      "sudo apt install -y default-jdk tomcat8",
+      "curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && unzip awscli-bundle.zip && sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws",
+      "sleep 2m"
       "aws configure set aws_access_key_id ${var.aws-id}",
       "aws configure set aws_secret_access_key ${var.aws-sec}",
       "aws configure set default.region us-east-2",
